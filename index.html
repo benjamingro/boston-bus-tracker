@@ -16,18 +16,52 @@
 </head>
 
 <body ng-app="busTrackerApp" ng-controller="BusTrackerCtrl as ctrl">
-    <nav class="navbar navbar-light bg-light">
-        <span class="navbar-brand mb-0 h1">MBTA Bus Tracker</span>
+    <nav class="navbar navbar-light bg-light d-flex justify-content-center">
+        <span class="navbar-brand mb-0 h1">Massachusetts Bay Transportation Authority Bus Tracker</span>
     </nav>
     <div class="row w-100">
         <div class="col-lg-2"></div>
         <div class="col-lg-8">
             <div class="row w-100">
                 <div class="col-lg-6">
+                    <div class="row w-100">
+                        <div class="col text-secondary d-flex justify-content-center">
+                            <!-- {{(ctrl.routes | filter: {'attributes':{'long_name':ctrl.filterText}} ).length }} -->
+                            <!-- {{ctrl.routes.length}} -->
+                            Search {{ctrl.routes.length}} MBTA bus routes
+                        </div>
+                    </div>
+                    <div class="row w-100 my-2 ">
+                        <div class="col-lg-1"></div>
+                        <!-- <div class="col-lg-4 d-flex justify-content-end text-secondary">
+                            Search  routes: 
+                        </div> -->
+                        <div class="col-lg-10 d-flex justify-content-center">
+                            <input type="text" ng-model="ctrl.filterText"> 
+                        </div>
+                        <div class="col-lg-1"></div>
 
+                    </div>
+                    <div class="row w-100" style="height:400px;overflow-y:scroll;">
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-10">
+                            <ul class="list-group">
+                                <!--  -->
+                                <li class="list-group-item" ng-repeat="route in ctrl.routes | filter:{attributes:{long_name:ctrl.filterText}}" >
+                                    <div class="row w-100">
+                                        <div class="col-2"><input type="checkbox" ng-model="self.routes[$index].selected" ></div>
+                                        <div class="col-10">{{route.attributes.long_name}}</div>
+                                        <!-- <div class="col">route # {{$index}}</div> -->
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-1"></div>
+
+                    </div>
                 </div>
-                <div class="col-lg-6">
-                    <div id='map' style='width: 400px; height: 300px;'></div>
+                <div class="col-lg-6 p-lg-4">
+                    <div id='map' style='width: 600px; height: 450px;'></div>
 
                 </div>
             </div>

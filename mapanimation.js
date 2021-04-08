@@ -14,8 +14,10 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
   // #endregion
 
   self.routes = [];
-  self.vehicles = [];
+  // self.vehicles = [];
   self.mapBox_api_key = "ac149cccb08b4e288b949e58d9eac162";
+
+  self.filterText = ""; 
 
   self.initialize = function () {
 
@@ -24,36 +26,40 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       url: 'https://api-v3.mbta.com/routes?api_key=' + self.mapBox_api_key
     }).then((response) => {
       self.routes = response.data.data;
-      console.log("self.routes = ");
-      console.log(self.routes);
+       
+      for(let i=0; i < self.routes.length; i++)
+      {
+        self.routes[i]['selected']=false; 
+      }
+
     }, (errorResponse) => {
       // need to handle this error 
+      console.log("inside error"); 
     });
 
-    let vehiclesPromise = $http({
-      method: 'GET',
-      url: 'https://api-v3.mbta.com/vehicles?api_key=' + self.mapBox_api_key
-    }).then((response) => {
-      self.vehicles = response.data.data;
-      console.log("self.vehicles = ");
-      console.log(self.vehicles);
-    }, (errorResponse) => {
-      // need to handle this error 
-    });
+    // let vehiclesPromise = $http({
+    //   method: 'GET',
+    //   url: 'https://api-v3.mbta.com/vehicles?api_key=' + self.mapBox_api_key
+    // }).then((response) => {
+    //   self.vehicles = response.data.data;
+    //   console.log("self.vehicles = ");
+    //   console.log(self.vehicles);
+    // }, (errorResponse) => {
+    //   // need to handle this error 
+    // });
 
-    Promise.all([routesPromise, vehiclesPromise])
-      .then(
-        (response) => { 
-          console.log("all promises resolved! ");
-        },
-        (errorResponse) => { 
-          console.log("error in one of the promises ");
+    // Promise.all([routesPromise, vehiclesPromise])
+    //   .then(
+    //     (response) => { 
+    //       console.log("all promises resolved! ");
+    //     },
+    //     (errorResponse) => { 
+    //       console.log("error in one of the promises ");
 
-        });
+    //     });
+
 
   };
-
-
 
   self.initialize();
 
