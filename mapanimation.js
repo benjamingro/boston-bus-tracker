@@ -23,7 +23,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   self.selectedRoutes = [];
   self.vehicles = [];
-  self.updateIntervalMs = 3000;
+  self.updateIntervalMs = 4000;
   self.mapBox_api_key = "ac149cccb08b4e288b949e58d9eac162";
 
   self.filterText = "";
@@ -80,8 +80,8 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
           }
         }
 
-        self.updateActiveFilteredRoutes(); 
-        self.updateEventHandlers();
+        self.update_activeFilteredRoutes(); 
+        // self.updateEventHandlers();
         $scope.$apply();
       },
       (errorResponses) => {
@@ -90,9 +90,18 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   self.initialize();
 
-  self.updateActiveFilteredRoutes = function()
+  self.update_activeFilteredRoutes = function()
   {
-    
+    self.activeFilteredRoutes = []; 
+    let i = 0; 
+    const regex = new RegExp(self.filterText,'gi');
+    for(i = 0; i < self.activeRoutes.length;i++){
+      if(regex.test(self.activeRoutes[i].attributes.long_name)){
+        self.activeFilteredRoutes.push(self.activeRoutes[i]);
+      }
+    }
+    self.updateEventHandlers();
+
   }
 
   self.getSelectedVehiclesPosition = function () {
@@ -136,17 +145,17 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   self.updateSelectedRoutes = function () {
     self.selectedRoutes = [];
-    console.log('inside updateSelectedRoutes, self.activeRoutes.length = '+self.activeRoutes.length); 
+    console.log('inside updateSelectedRoutes, self.activeFilteredRoutes.length = '+self.activeFilteredRoutes.length); 
     let selectedCounter = 0; 
     let i = 0
-    for (i = 0; i < self.activeRoutes.length; i++) {
-      if (self.activeRoutes[i].selected == true) {
+    for (i = 0; i < self.activeFilteredRoutes.length; i++) {
+      if (self.activeFilteredRoutes[i].selected == true) {
         selectedCounter++; 
-        self.selectedRoutes.push(self.activeRoutes[i]);
+        self.selectedRoutes.push(self.activeFilteredRoutes[i]);
       }
     }
-    console.log('finished self.updateSelectedRoutes, self.activeRoutes = ');
-    console.log(self.activeRoutes) ; 
+    console.log('finished self.updateSelectedRoutes, self.activeFilteredRoutes = ');
+    console.log(self.activeFilteredRoutes) ; 
     console.log(`selectedCounter = ${selectedCounter}`); 
   }
 
