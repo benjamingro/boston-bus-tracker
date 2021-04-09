@@ -28,7 +28,9 @@
                         <div class="col text-secondary d-flex justify-content-center">
                             <!-- {{(ctrl.routes | filter: {'attributes':{'long_name':ctrl.filterText}} ).length }} -->
                             <!-- {{ctrl.routes.length}} -->
-                            Search {{ctrl.routes.length}} MBTA bus routes
+                            <!-- Search {{ctrl.routes.length}} MBTA bus routes -->
+                            Search {{ctrl.activeRoutes.length}} active bus routes
+
                         </div>
                     </div>
                     <div class="row w-100 my-2 ">
@@ -37,7 +39,7 @@
                             Search  routes: 
                         </div> -->
                         <div class="col-lg-10 d-flex justify-content-center">
-                            <input type="text" ng-model="ctrl.filterText"> 
+                            <input type="text" ng-model="ctrl.filterText" ng-change="ctrl.updateActiveFilteredRoutes()"> 
                         </div>
                         <div class="col-lg-1"></div>
 
@@ -46,9 +48,10 @@
                         <div class="col-lg-1"></div>
                         <div class="col-lg-10">
                             <ul class="list-group">
-                                <li class="list-group-item clickArea" ng-repeat="route in ctrl.routes | filter:{attributes:{long_name:ctrl.filterText}}" >
+                                <!-- | filter:{attributes:{long_name:ctrl.filterText}} -->
+                                <li class="list-group-item clickArea" ng-repeat="route in ctrl.activeRoutes " >
                                     <div class="row w-100">
-                                        <div class="col-2"><input type="checkbox" ng-model="self.routes[$index].selected" ng-change="ctrl.updateSelectedRoutes()"></div>
+                                        <div class="col-2"><input type="checkbox" ng-model="ctrl.activeRoutes[$index].selected" ng-change="ctrl.updateSelectedRoutes()"></div>
                                         <div class="col-10">{{route.attributes.long_name}}</div>
                                     </div>
                                 </li>
