@@ -46,12 +46,10 @@
                         <div class="col-lg-1"></div>
                         <div class="col-lg-10">
                             <ul class="list-group">
-                                <!--  -->
                                 <li class="list-group-item clickArea" ng-repeat="route in ctrl.routes | filter:{attributes:{long_name:ctrl.filterText}}" >
                                     <div class="row w-100">
-                                        <div class="col-2"><input type="checkbox" ng-model="self.routes[$index].selected" ></div>
+                                        <div class="col-2"><input type="checkbox" ng-model="self.routes[$index].selected" ng-change="ctrl.updateSelectedRoutes()"></div>
                                         <div class="col-10">{{route.attributes.long_name}}</div>
-                                        <!-- <div class="col">route # {{$index}}</div> -->
                                     </div>
                                 </li>
                             </ul>
