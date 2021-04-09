@@ -14,10 +14,11 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
   // #endregion
 
   self.routes = [];
+  self.selectedRoutes = []; 
   // self.vehicles = [];
   self.mapBox_api_key = "ac149cccb08b4e288b949e58d9eac162";
 
-  self.filterText = ""; 
+  self.filterText = "";
 
   self.initialize = function () {
 
@@ -26,42 +27,64 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       url: 'https://api-v3.mbta.com/routes?api_key=' + self.mapBox_api_key
     }).then((response) => {
       self.routes = response.data.data;
-       
-      for(let i=0; i < self.routes.length; i++)
-      {
-        self.routes[i]['selected']=false; 
-      }
 
+      for (let i = 0; i < self.routes.length; i++) {
+        self.routes[i]['selected'] = false;
+      }
+      self.updateEventHandlers(); 
     }, (errorResponse) => {
       // need to handle this error 
-      console.log("inside error"); 
+      console.log("inside error");
     });
 
-    // let vehiclesPromise = $http({
-    //   method: 'GET',
-    //   url: 'https://api-v3.mbta.com/vehicles?api_key=' + self.mapBox_api_key
-    // }).then((response) => {
-    //   self.vehicles = response.data.data;
-    //   console.log("self.vehicles = ");
-    //   console.log(self.vehicles);
-    // }, (errorResponse) => {
-    //   // need to handle this error 
-    // });
 
-    // Promise.all([routesPromise, vehiclesPromise])
-    //   .then(
-    //     (response) => { 
-    //       console.log("all promises resolved! ");
-    //     },
-    //     (errorResponse) => { 
-    //       console.log("error in one of the promises ");
-
-    //     });
-
-
+    
   };
 
   self.initialize();
 
+  self.updateSelectedRoutes = function()
+  {
+    self.selectedRoutes = []; 
+    for(let i=0; i<self.routes.length;i++ )
+    {
+      if(self.routes[i].selected == true)
+      {
+        self.selectedRoutes.push(self.routes[i].id); 
+      }
+    }
+  }
+
+
+
+  self.updateEventHandlers = function () {
+    console.log("inside updateEventHandlers "); 
+    setTimeout(function(){
+      $('.clickArea').off("click");
+
+      $('.clickArea').click(function (event) {
+        if (event.target.tagName.toLowerCase() !== 'input') {
+          $('input:checkbox', this).trigger('click');
+        }
+      });
+  
+      $('.clickArea').hover(function () {
+        $(this).addClass("hovered");
+      }, function () {
+        $(this).removeClass("hovered");
+      });
+    },75)
+    
+  }
+
 }]);
+
+$(function () {
+
+  console.log("inside page initialize");
+
+
+});
+
+
 
