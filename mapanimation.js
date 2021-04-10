@@ -23,7 +23,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   self.selectedRoutes = [];
   self.vehicles = [];
-  self.updateIntervalMs = 4000;
+  self.updateIntervalMs = 10000;
   self.mapBox_api_key = "ac149cccb08b4e288b949e58d9eac162";
 
   self.filterText = "";
@@ -105,7 +105,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
   }
 
   self.getSelectedVehiclesPosition = function () {
-    // console.log('inside self.getSelectedVehiclesPosition');
+    console.log('inside self.getSelectedVehiclesPosition');
     // console.log('self.selectedRoutes = ');
     // console.log(self.selectedRoutes); 
 
@@ -115,14 +115,27 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       for (j = 0; j < self.selectedRoutes[i].vehicles.length; j++) {
         const my_url = `https://api-v3.mbta.com/vehicles/${self.selectedRoutes[i].vehicles[j].vehicleId}?api_key=${self.mapBox_api_key}`; 
         console.log(`my_url = ${my_url}`);
+        
+        // console.log('outside of promise, self.selectedRoutes[i] = ');
+        // console.log(self.selectedRoutes[i]);
+        console.log('outside of promise, i & j =  ');
+
+        console.log(`i = ${i}`);
+        console.log(`j = ${j}`)
         let positionPromise = $http({
           method: 'GET',
           url: my_url
         }).then(
-          (response) => {
-            const myLngLatArray = [response.data.data.attributes.longitude, response.data.data.attributes.latitude]
+          (response, my_i = i) => {
+            console.log('inside resolved promise, i & j = ');
+            console.log(`my_i = ${my_i}`);
+            console.log(`i = ${i}`);
+            console.log(`j = ${j}`);
+            const myLngLatArray = [response.data.data.attributes.longitude, response.data.data.attributes.latitude]; 
+            
             self.selectedRoutes[i].vehicles[j].lngLatArray = myLngLatArray;
-            console.log(`routeId = ${self.selectedRoutes[i].id} , vehicleId = ${self.selectedRoutes[i].vehicles[j].vehicleId} , myLngLatArray = ${JSON.stringify(myLngLatArray)}`);
+            console.log('finished resolved promise');
+            // console.log(`routeId = ${self.selectedRoutes[i].id} , vehicleId = ${self.selectedRoutes[i].vehicles[j].vehicleId} , myLngLatArray = ${JSON.stringify(myLngLatArray)}`);
           },
           (errorResponse) => {
 
@@ -135,6 +148,8 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
     Promise.all(positionPromiseArray).then(
       (responses)=>{
         // update vehicle positions on map 
+        // console.log('inside getSelectedVehiclesPosition, self.selected = ');
+        // console.log(self.selected); 
       },
       (errorResponses)=>{
 
