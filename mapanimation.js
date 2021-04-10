@@ -25,7 +25,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   self.selectedRoutes = [];
   self.vehicles = [];
-  self.updateIntervalMs = 10000;
+  self.updateIntervalMs = 3000;
   self.mapBox_api_key = "ac149cccb08b4e288b949e58d9eac162";
 
   self.filterText = "";
@@ -70,7 +70,8 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
               self.routes[i].vehicles.push(
                 {
                   vehicleId: self.vehicles[j].id,
-                  lngLatArray: []
+                  lngLatArray: [],
+                  previous_lngLatArray:[]
                 }
               );
             }
@@ -107,23 +108,12 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
   }
 
   self.getSelectedVehiclesPosition = function () {
-    console.log('inside self.getSelectedVehiclesPosition');
-    // console.log('self.selectedRoutes = ');
-    // console.log(self.selectedRoutes); 
-
     let i, j = 0;
     let positionPromiseArray = [];
     for (i = 0; i < self.selectedRoutes.length; i++) {
       for (j = 0; j < self.selectedRoutes[i].vehicles.length; j++) {
         const my_url = `https://api-v3.mbta.com/vehicles/${self.selectedRoutes[i].vehicles[j].vehicleId}?api_key=${self.mapBox_api_key}`;
-        console.log(`my_url = ${my_url}`);
 
-        // console.log('outside of promise, self.selectedRoutes[i] = ');
-        // console.log(self.selectedRoutes[i]);
-        console.log('outside of promise, i & j =  ');
-
-        console.log(`i = ${i}`);
-        console.log(`j = ${j}`)
         let positionPromise = $http({
           method: 'GET',
           url: my_url
@@ -135,8 +125,8 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
             for (x = 0; x < self.selectedRoutes.length; x++) {
               for (y = 0; y < self.selectedRoutes[x].vehicles.length; y++) {
                 if (self.selectedRoutes[x].vehicles[y].vehicleId === vehicleId) {
+                  self.selectedRoutes[x].vehicles[y].previous_lngLatArray = self.selectedRoutes[x].vehicles[y].lngLatArray; 
                   self.selectedRoutes[x].vehicles[y].lngLatArray = myLngLatArray;
-                  console.log(`routeId = ${self.selectedRoutes[x].id} , vehicleId = ${self.selectedRoutes[x].vehicles[y].vehicleId} , myLngLatArray = ${JSON.stringify(myLngLatArray)}`);
 
                 }
               }
@@ -163,10 +153,45 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         self.markerArray = [];
         for(i=0; i<self.selectedRoutes.length;i++) {
           for(j=0; j<self.selectedRoutes[i].vehicles.length;j++){
-              // self.marker = new mapboxgl.Marker().setLngLat([-71.092761, 42.357575]).addTo(self.map);
             let myLngLatArray = self.selectedRoutes[i].vehicles[j].lngLatArray; 
-            // let newMarker = new mapboxgl.Marker().setLngLat(myLngLatArray); 
-            let newMarker = new mapboxgl.Marker().setLngLat(myLngLatArray).addTo(self.map); 
+            let myPreviousLngLatArray = self.selectedRoutes[i].vehicles[j].previous_lngLatArray; 
+
+            let myMarkerColor = self.selectedRoutes[i].markerColor; 
+            // let markerElement = $(`<div style="color:${self.selectedRoutes[i].markerColor};"><div>`);
+            // let markerElement = $('<div style="color:red;"><div>');
+
+            // let markerElement = $('<div style="color:red;"><div>');
+            // $('body').append(markerElement); 
+
+            // let el = document.createElement('div');
+            // // el.innerHTML ='<i class="fas fa-shuttle-van"></i>'; 
+            // el.innerHTML ='<span>innterHtml</span>'; 
+
+            // el.innerText = 'myMarker';
+            // el.className = 'marker';
+            // el.style.color = 'red';
+            // el.style = {color:myMarkerColor +' !important'};
+            // <i class="fas fa-shuttle-van"></i> 
+
+            let el = document.createElement('i');
+            // el.className = 'fas fa-shuttle-van '+self.get_iconRotationClass(myLngLatArray,myPreviousLngLatArray);  
+            el.className = 'fas fa-shuttle-van';
+            // el.className = 'fas fa-shuttle-van fa-flip-horizontal';
+
+            // fa-flip-horizontal  
+
+            el.style.color=myMarkerColor;
+
+            let rotationDegrees = self.get_iconRotation(myLngLatArray,myPreviousLngLatArray); 
+            // let rotationDegrees = 0; 
+
+
+
+            // let newMarker = new mapboxgl.Marker(el).setLngLat(myLngLatArray).addTo(self.map); 
+            let newMarker = new mapboxgl.Marker({element:el,rotation:rotationDegrees}).setLngLat(myLngLatArray).addTo(self.map); 
+
+            // let newMarker = new mapboxgl.Marker(markerElement).setLngLat(myLngLatArray).addTo(self.map); 
+
 
             newMarker.addTo(self.map); 
             self.markerArray.push(newMarker); 
@@ -181,9 +206,82 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   setInterval(self.getSelectedVehiclesPosition, self.updateIntervalMs);
 
+  self.get_iconRotation = function(lngLatArray,previous_lngLatArray){
+    if(JSON.stringify(previous_lngLatArray) == '[]'){
+      return '0'; 
+    }
+    else{
+      let deltaLng = lngLatArray[0] - previous_lngLatArray[0]; 
+      let deltaLat = lngLatArray[1] - previous_lngLatArray[1];
+      let hypotenuse = Math.sqrt(Math.pow(deltaLng,2) + Math.pow(deltaLat,2)); 
+
+      let rotationAngle = Math.acos(deltaLng/hypotenuse);
+      let pi = Math.PI;
+      let rotationDegrees = rotationAngle*360/(2*pi); 
+      return rotationDegrees; 
+      
+    }
+
+    // return 'fa-flip-horizontal';
+     
+    // let deltaLng = lngLatArray[0] - previous_lngLatArray[0]; 
+    // let deltaLat = lngLatArray[1] - previous_lngLatArray[1];
+    // let hypotenuse = Math.sqrt(Math.pow(deltaLng,2) + Math.pow(deltaLat,2)); 
+
+    // let rotationAngle = Math.acos(deltaLng/hypotenuse);
+    // let pi = Math.PI;  
+    // if((rotationAngle>=0 && rotationAngle<=pi/4) || rotationAngle > 7/4 * pi)
+    // {
+    //   return ''; 
+    // }
+    // else if (rotationAngle > pi/4 && rotationAngle<= pi*3/4)
+    // {
+    //   return 'fa-rotate-270'; 
+    // }
+    // else if(rotationAngle> 3/4*pi && rotationAngle <= 5/4*pi)
+    // {
+    //   return 'fa-flip-horizontal';
+    // }
+    // else if(rotationAngle > 5/4*pi && rotationAngle <= 7/4*pi)
+    // {
+    //   return 'fa-rotate-90';
+    // }
+  }
+
+  // self.get_iconRotationClass = function(lngLatArray,previous_lngLatArray){
+  //   // if(JSON.stringify(previous_lngLatArray) == '[]')
+  //   // {
+  //   //   return ''; 
+  //   // }
+
+  //   return 'fa-flip-horizontal';
+     
+  //   // let deltaLng = lngLatArray[0] - previous_lngLatArray[0]; 
+  //   // let deltaLat = lngLatArray[1] - previous_lngLatArray[1];
+  //   // let hypotenuse = Math.sqrt(Math.pow(deltaLng,2) + Math.pow(deltaLat,2)); 
+
+  //   // let rotationAngle = Math.acos(deltaLng/hypotenuse);
+  //   // let pi = Math.PI;  
+  //   // if((rotationAngle>=0 && rotationAngle<=pi/4) || rotationAngle > 7/4 * pi)
+  //   // {
+  //   //   return ''; 
+  //   // }
+  //   // else if (rotationAngle > pi/4 && rotationAngle<= pi*3/4)
+  //   // {
+  //   //   return 'fa-rotate-270'; 
+  //   // }
+  //   // else if(rotationAngle> 3/4*pi && rotationAngle <= 5/4*pi)
+  //   // {
+  //   //   return 'fa-flip-horizontal';
+  //   // }
+  //   // else if(rotationAngle > 5/4*pi && rotationAngle <= 7/4*pi)
+  //   // {
+  //   //   return 'fa-rotate-90';
+  //   // }
+  // }
+
   self.updateSelectedRoutes = function () {
     self.selectedRoutes = [];
-    console.log('inside updateSelectedRoutes, self.activeFilteredRoutes.length = ' + self.activeFilteredRoutes.length);
     let selectedCounter = 0;
     let i = 0
     for (i = 0; i < self.activeFilteredRoutes.length; i++) {
@@ -192,9 +290,6 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         self.selectedRoutes.push(self.activeFilteredRoutes[i]);
       }
     }
-    console.log('finished self.updateSelectedRoutes, self.activeFilteredRoutes = ');
-    console.log(self.activeFilteredRoutes);
-    console.log(`selectedCounter = ${selectedCounter}`);
   }
 
   self.updateEventHandlers = function () {
@@ -214,7 +309,6 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       }, function () {
         $(this).removeClass("hovered");
       });
-      console.log("finish updateEventHandlers ");
     }, 200)
 
   }
@@ -232,7 +326,6 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
 $(function () {
 
-  console.log("inside page initialize");
 
 
 });
