@@ -9,7 +9,9 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
     zoom: 12,
   });
 
-  // self.marker = {};
+  self.markerArray = []; 
+
+  self.marker = {};
   // self.marker = new mapboxgl.Marker().setLngLat([-71.092761, 42.357575]).addTo(self.map);
   self.geojson = {
     type: 'FeatureCollection',
@@ -39,6 +41,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       for (let i = 0; i < self.routes.length; i++) {
         self.routes[i]['selected'] = false;
         self.routes[i]['vehicles'] = [];
+        self.routes[i]['markerColor'] = self.getRandomColor(); 
       }
 
     }, (errorResponse) => {
@@ -80,7 +83,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
           }
         }
 
-        self.update_activeFilteredRoutes(); 
+        self.update_activeFilteredRoutes();
         // self.updateEventHandlers();
         $scope.$apply();
       },
@@ -90,13 +93,12 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   self.initialize();
 
-  self.update_activeFilteredRoutes = function()
-  {
-    self.activeFilteredRoutes = []; 
-    let i = 0; 
-    const regex = new RegExp(self.filterText,'gi');
-    for(i = 0; i < self.activeRoutes.length;i++){
-      if(regex.test(self.activeRoutes[i].attributes.long_name)){
+  self.update_activeFilteredRoutes = function () {
+    self.activeFilteredRoutes = [];
+    let i = 0;
+    const regex = new RegExp(self.filterText, 'gi');
+    for (i = 0; i < self.activeRoutes.length; i++) {
+      if (regex.test(self.activeRoutes[i].attributes.long_name)) {
         self.activeFilteredRoutes.push(self.activeRoutes[i]);
       }
     }
@@ -113,9 +115,9 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
     let positionPromiseArray = [];
     for (i = 0; i < self.selectedRoutes.length; i++) {
       for (j = 0; j < self.selectedRoutes[i].vehicles.length; j++) {
-        const my_url = `https://api-v3.mbta.com/vehicles/${self.selectedRoutes[i].vehicles[j].vehicleId}?api_key=${self.mapBox_api_key}`; 
+        const my_url = `https://api-v3.mbta.com/vehicles/${self.selectedRoutes[i].vehicles[j].vehicleId}?api_key=${self.mapBox_api_key}`;
         console.log(`my_url = ${my_url}`);
-        
+
         // console.log('outside of promise, self.selectedRoutes[i] = ');
         // console.log(self.selectedRoutes[i]);
         console.log('outside of promise, i & j =  ');
@@ -126,52 +128,73 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
           method: 'GET',
           url: my_url
         }).then(
-          (response, my_i = i) => {
-            console.log('inside resolved promise, i & j = ');
-            console.log(`my_i = ${my_i}`);
-            console.log(`i = ${i}`);
-            console.log(`j = ${j}`);
-            const myLngLatArray = [response.data.data.attributes.longitude, response.data.data.attributes.latitude]; 
-            
-            self.selectedRoutes[i].vehicles[j].lngLatArray = myLngLatArray;
-            console.log('finished resolved promise');
-            // console.log(`routeId = ${self.selectedRoutes[i].id} , vehicleId = ${self.selectedRoutes[i].vehicles[j].vehicleId} , myLngLatArray = ${JSON.stringify(myLngLatArray)}`);
+          (response) => {
+            const myLngLatArray = [response.data.data.attributes.longitude, response.data.data.attributes.latitude];
+            const vehicleId = response.data.data.id;
+            let x, y = 0;
+            for (x = 0; x < self.selectedRoutes.length; x++) {
+              for (y = 0; y < self.selectedRoutes[x].vehicles.length; y++) {
+                if (self.selectedRoutes[x].vehicles[y].vehicleId === vehicleId) {
+                  self.selectedRoutes[x].vehicles[y].lngLatArray = myLngLatArray;
+                  console.log(`routeId = ${self.selectedRoutes[x].id} , vehicleId = ${self.selectedRoutes[x].vehicles[y].vehicleId} , myLngLatArray = ${JSON.stringify(myLngLatArray)}`);
+
+                }
+              }
+            }
           },
           (errorResponse) => {
 
           });
 
-          positionPromiseArray.push(positionPromise); 
+        positionPromiseArray.push(positionPromise);
       }
     }
 
     Promise.all(positionPromiseArray).then(
-      (responses)=>{
+      (responses) => {
         // update vehicle positions on map 
-        // console.log('inside getSelectedVehiclesPosition, self.selected = ');
-        // console.log(self.selected); 
+        // first remove current markers 
+        // re-initialize marker array 
+        // add new markers 
+        let i,j = 0; 
+        for(i = 0; i<self.markerArray.length;i++){
+          self.markerArray[i].remove(); 
+        }
+        self.markerArray = [];
+        for(i=0; i<self.selectedRoutes.length;i++) {
+          for(j=0; j<self.selectedRoutes[i].vehicles.length;j++){
+              // self.marker = new mapboxgl.Marker().setLngLat([-71.092761, 42.357575]).addTo(self.map);
+            let myLngLatArray = self.selectedRoutes[i].vehicles[j].lngLatArray; 
+            // let newMarker = new mapboxgl.Marker().setLngLat(myLngLatArray); 
+            let newMarker = new mapboxgl.Marker().setLngLat(myLngLatArray).addTo(self.map); 
+
+            newMarker.addTo(self.map); 
+            self.markerArray.push(newMarker); 
+          }
+        }
+
       },
-      (errorResponses)=>{
+      (errorResponses) => {
 
       });
   }
 
-  setInterval(self.getSelectedVehiclesPosition,self.updateIntervalMs);
+  setInterval(self.getSelectedVehiclesPosition, self.updateIntervalMs);
 
   self.updateSelectedRoutes = function () {
     self.selectedRoutes = [];
-    console.log('inside updateSelectedRoutes, self.activeFilteredRoutes.length = '+self.activeFilteredRoutes.length); 
-    let selectedCounter = 0; 
+    console.log('inside updateSelectedRoutes, self.activeFilteredRoutes.length = ' + self.activeFilteredRoutes.length);
+    let selectedCounter = 0;
     let i = 0
     for (i = 0; i < self.activeFilteredRoutes.length; i++) {
       if (self.activeFilteredRoutes[i].selected == true) {
-        selectedCounter++; 
+        selectedCounter++;
         self.selectedRoutes.push(self.activeFilteredRoutes[i]);
       }
     }
     console.log('finished self.updateSelectedRoutes, self.activeFilteredRoutes = ');
-    console.log(self.activeFilteredRoutes) ; 
-    console.log(`selectedCounter = ${selectedCounter}`); 
+    console.log(self.activeFilteredRoutes);
+    console.log(`selectedCounter = ${selectedCounter}`);
   }
 
   self.updateEventHandlers = function () {
@@ -194,6 +217,15 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       console.log("finish updateEventHandlers ");
     }, 200)
 
+  }
+
+  self.getRandomColor = function () {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   }
 
 }]);
