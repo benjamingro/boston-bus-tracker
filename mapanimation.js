@@ -148,7 +148,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
             }
           },
           (errorResponse) => {
-            self.errorReset();
+            //quietly fail
           });
 
         positionPromiseArray.push(positionPromise);
@@ -165,7 +165,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       },
       (errorResponses) => {
         self.updateVehiclePositions();
-        
+
       });
   }
 
