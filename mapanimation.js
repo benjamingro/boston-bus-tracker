@@ -57,7 +57,6 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
     }, (errorResponse) => {
       // need to handle this error 
-      console.log("inside error");
     });
 
     let vehiclesPromise = $http({
@@ -68,7 +67,6 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
     }, (errorResponse) => {
       // need to handle this error 
-      console.log("inside error");
     });
 
     Promise.all([routesPromise, vehiclesPromise]).then(
@@ -145,8 +143,6 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
                     self.selectedRoutes[x].vehicles[y].previous_lngLatArray = self.selectedRoutes[x].vehicles[y].lngLatArray; 
                     self.selectedRoutes[x].vehicles[y].lngLatArray = myLngLatArray;
                   }
-                  
-
                 }
               }
             }
