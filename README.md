@@ -11,6 +11,8 @@ This project has the following features.
 
 * Shows the orientation of the bus along the route.  
 
+### Screenshots 
+
 #### Large Screen Size
 
 ![Large Screen Size](images/LapTopImage1.png?raw=true "Large Screen Size")
