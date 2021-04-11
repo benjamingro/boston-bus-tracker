@@ -8,14 +8,27 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
     zoom: 12,
   });
 
+  self.map.on('load',function(){
+    self.sizeMap();
+  }); 
+
+  $( window ).resize(function() {
+    self.sizeMap(); 
+  });
+  
+  self.sizeMap = function()
+  {
+    let mapMaxHeight = $(window).height() - $('#navbarTop').height() - $('#navbarBottom').height() - 100; 
+    if(mapMaxHeight < 600) mapMaxHeight = 600; 
+    $('#map').width($('#mapCol').width());
+    $('#map').height(mapMaxHeight);
+    self.map.resize();
+  }
+
   self.markerArray = []; 
 
   self.marker = {};
-  // self.marker = new mapboxgl.Marker().setLngLat([-71.092761, 42.357575]).addTo(self.map);
-  self.geojson = {
-    type: 'FeatureCollection',
-    features: []
-  };
+
   // #endregion
 
   self.routes = [];
@@ -83,8 +96,9 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         }
 
         self.update_activeFilteredRoutes();
-        // self.updateEventHandlers();
         $scope.$apply();
+        $('#waitCard').hide(); 
+        $('#ui').show(); 
       },
       (errorResponses) => {
       });
@@ -178,6 +192,9 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
           }
         }
 
+        $('#waitCard').hide();
+        $('#ui').show(); 
+
       },
       (errorResponses) => {
 
@@ -194,12 +211,10 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       let deltaLng = lngLatArray[0] - previous_lngLatArray[0]; 
       let deltaLat = lngLatArray[1] - previous_lngLatArray[1];
       let hypotenuse = Math.sqrt(Math.pow(deltaLng,2) + Math.pow(deltaLat,2)); 
-
       let rotationAngle = Math.acos(deltaLng/hypotenuse);
       let pi = Math.PI;
       let rotationDegrees = rotationAngle*360/(2*pi); 
       return rotationDegrees; 
-      
     }
   }
 
@@ -215,12 +230,13 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         self.selectedRoutes.push(my_route);
       }
     }
+    $('#ui').hide(); 
+    $('#waitCard').show();
   }
 
   self.updateEventHandlers = function () {
 
     setTimeout(function () {
-
       $('.clickArea').off("click");
 
       $('.clickArea').click(function (event) {
@@ -235,7 +251,6 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         $(this).removeClass("hovered");
       });
     }, 200)
-
   }
 
   self.getMarkerColor = function (route_long_name) {
@@ -260,27 +275,13 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       return self.brightColorArray[Math.floor(Math.random() * self.brightColorArray.length)];
     }
 
-    
   }
 
   self.brightColorArray = ['#FF3855','#FFAA1D','#FFF700','#299617','#2243B6','#5946B2','#9C51B6','#A83731','#FF007C','#E936A7','#FDFF00','#AF6E4D'];
 
-  // self.getRandomColor = function () {
-  //   var letters = '0123456789ABCDEF';
-  //   var color = '#';
-  //   for (var i = 0; i < 6; i++) {
-  //     color += letters[Math.floor(Math.random() * 16)];
-  //   }
-  //   return color;
-  // }
-
 }]);
 
-$(function () {
 
-
-
-});
 
 
 
