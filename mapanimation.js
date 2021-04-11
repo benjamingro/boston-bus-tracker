@@ -56,7 +56,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       }
 
     }, (errorResponse) => {
-      // need to handle this error 
+      self.errorReset();  
     });
 
     let vehiclesPromise = $http({
@@ -66,7 +66,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       self.vehicles = response.data.data;
 
     }, (errorResponse) => {
-      // need to handle this error 
+      self.errorReset(); 
     });
 
     Promise.all([routesPromise, vehiclesPromise]).then(
@@ -99,6 +99,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         $('#ui').show(); 
       },
       (errorResponses) => {
+        self.errorReset(); 
       });
   };
 
@@ -148,7 +149,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
             }
           },
           (errorResponse) => {
-
+            self.errorReset(); 
           });
 
         positionPromiseArray.push(positionPromise);
@@ -193,11 +194,12 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
       },
       (errorResponses) => {
-
+        self.errorReset();
       });
   }
 
   setInterval(self.getSelectedVehiclesPosition, self.updateIntervalMs);
+
 
   self.get_iconRotation = function(lngLatArray,previous_lngLatArray){
     if(JSON.stringify(previous_lngLatArray) == '[]'){
@@ -271,6 +273,27 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       return self.brightColorArray[Math.floor(Math.random() * self.brightColorArray.length)];
     }
 
+  }
+
+  self.errorOk = function()
+  {
+    $('#errorCard').hide(); 
+    $('#ui').show(); 
+    
+  }
+
+  self.errorReset = function()
+  {
+    self.selectedRoutes = [];
+
+    for(let i = 0; i < self.activeFilteredRoutes.length;i++)
+    {
+      self.activeFilteredRoutes[i].selected = false; 
+    }
+
+    $('#ui').hide(); 
+    $('#waitCard').hide(); 
+    $('#errorCard').show();
   }
 
   self.brightColorArray = ['#FF3855','#FFAA1D','#FFF700','#299617','#2243B6','#5946B2','#9C51B6','#A83731','#FF007C','#E936A7','#FDFF00','#AF6E4D'];

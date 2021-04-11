@@ -21,6 +21,9 @@
     <nav class="navbar navbar-light bg-light d-flex justify-content-center" id="navbarTop">
         <span class="navbar-brand mb-0 h1">MBTA Bus Tracker</span>
     </nav>
+    <!--start user dialog "cards"  -->
+
+    <!--user wait card-->
     <div class="row w-100 mt-5" id="waitCard" >
         <div class="col-lg-4"></div>
         <div class="col-lg-4 pl-4">
@@ -37,6 +40,32 @@
         </div>
         <div class="col-lg-4"></div>
     </div>
+
+    <!--server error card-->
+    <div class="row w-100 mt-5" id="errorCard" style="display:none;">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4 pl-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-center" style="font-size:1.2rem;">
+                    Oops, it looks like we had difficulty getting the data at the moment. 
+                  </div>
+                  
+                  <div class="card-body py-5">
+                    <p class="card-text ">
+                        Let's reset and you can try the request again. 
+                    </p>
+                    <p class="card-text d-flex justify-content-center"> 
+                        <button class="btn btn-primary" style="width:100px;" ng-click="ctrl.errorOk()">Ok</button>
+                    </p>
+                  </div>
+                  
+            </div>
+        </div>
+        <div class="col-lg-4"></div>
+    </div>
+
+    <!--end user dialog "cards"  -->
+
     <div class="row w-100" id="ui" style="display:none;">
         <div class="col-lg-1"></div>
         <div class="col-lg-10">
