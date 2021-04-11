@@ -11,7 +11,15 @@ This project has the following features.
 
 * Shows the orientation of the bus along the route.  
 
-This project uses Bootstrap 4 and AngularJS to create a modern looking and highly functioning user interface. 
+### Technology Stack
+
+* Bootstrap 4
+
+* AngularJs 1.8
+
+* Mapbox GL JS 
+
+* MBTA V3 API 
 
 ### Screenshots 
 
@@ -31,15 +39,7 @@ This project uses Bootstrap 4 and AngularJS to create a modern looking and highl
 
 ![iPhone 6/7/8 Horizontal](images/iPhoneHorizontal2.png?raw=true "iPhone 6/7/8 Vertical")
 
-### Technology Stack
 
-* Bootstrap 4
-
-* AngularJs 1.8
-
-* Mapbox GL JS 
-
-* MBTA V3 API
 
 
 
