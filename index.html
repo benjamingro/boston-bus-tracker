@@ -19,7 +19,7 @@
 
 <body ng-app="busTrackerApp" ng-controller="BusTrackerCtrl as ctrl">
     <nav class="navbar navbar-light bg-light d-flex justify-content-center">
-        <span class="navbar-brand mb-0 h1">Massachusetts Bay Transportation Authority Bus Tracker<i class="fas fa-shuttle-van"></i></span>
+        <span class="navbar-brand mb-0 h1">Massachusetts Bay Transportation Authority Bus Tracker</span>
     </nav>
     <div class="row w-100">
         <div class="col-lg-2"></div>
@@ -54,13 +54,18 @@
                         <div class="col-lg-1"></div>
 
                     </div>
-                </div>
-                <div class="col-lg-6 p-lg-4">
                     <div class="row w-100">
                         <div class="col">
-                            <!--bus tracking legend-->
+                            <div class="d-inline-block p-2 m-2" ng-repeat="selectedRoute in ctrl.selectedRoutes" style="border: 2px solid {{selectedRoute.markerColor}}; border-radius:10%;"><i class="fas fa-shuttle-van" style="color:{{selectedRoute.markerColor}};"></i>&nbsp;&nbsp;{{selectedRoute.attributes.long_name}}</div>
                         </div>
                     </div>
+                </div>
+                <div class="col-lg-6 p-lg-4">
+                    <!-- <div class="row w-100 mb-3">
+                        <div class="col">
+                            <div class="d-inline-block p-2 m-2" ng-repeat="selectedRoute in ctrl.selectedRoutes" style="border: 2px solid {{selectedRoute.markerColor}}; border-radius:10%;"><i class="fas fa-shuttle-van" style="color:{{selectedRoute.markerColor}};"></i>&nbsp;&nbsp;{{selectedRoute.attributes.long_name}}</div>
+                        </div>
+                    </div> -->
                     <div class="row w-100">
                         <div class="col">
                             <!--map-->
@@ -75,6 +80,22 @@
         <div class="col-lg-2"></div>
 
     </div>
+    <!-- Footer -->
+  <footer class="py-2">
+    <div class="row w-100 text-secondary ">
+      <div class="col-xl-3 col-xs-12 d-flex px-5">
+        Ben Gross&nbsp;&copy;&nbsp;2021
+      </div>
+      <div class="col-xl-6 col-xs-12 d-flex justify-content-center px-5">
+
+        <div>MIT xPRO Professional Certificate in Coding: Full Stack Development with MERN - January 2021</div>
+
+      </div>
+      <div class="col-xl-3 col-xs-12 d-flex justify-content-end px-5" name="rightColumnName">
+        <div>Week 9 Homework Assignment</div>
+      </div>
+    </div>
+  </footer>
 
     <!-- Bootstrap core JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
