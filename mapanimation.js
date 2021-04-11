@@ -8,24 +8,23 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
     zoom: 12,
   });
 
-  self.map.on('load',function(){
+  self.map.on('load', function () {
     self.sizeMap();
-  }); 
-
-  $( window ).resize(function() {
-    self.sizeMap(); 
   });
-  
-  self.sizeMap = function()
-  {
-    let mapMaxHeight = $(window).height() - $('#navbarTop').height() - $('#navbarBottom').height() - 100; 
-    if(mapMaxHeight < 600) mapMaxHeight = 600; 
+
+  $(window).resize(function () {
+    self.sizeMap();
+  });
+
+  self.sizeMap = function () {
+    let mapMaxHeight = $(window).height() - $('#navbarTop').height() - $('#navbarBottom').height() - 100;
+    if (mapMaxHeight < 600) mapMaxHeight = 600;
     $('#map').width($('#mapCol').width());
     $('#map').height(mapMaxHeight);
     self.map.resize();
   }
 
-  self.markerArray = []; 
+  self.markerArray = [];
 
   self.marker = {};
 
@@ -56,7 +55,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       }
 
     }, (errorResponse) => {
-      self.errorReset();  
+      self.errorReset();
     });
 
     let vehiclesPromise = $http({
@@ -66,7 +65,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
       self.vehicles = response.data.data;
 
     }, (errorResponse) => {
-      self.errorReset(); 
+      self.errorReset();
     });
 
     Promise.all([routesPromise, vehiclesPromise]).then(
@@ -80,7 +79,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
                 {
                   vehicleId: self.vehicles[j].id,
                   lngLatArray: [],
-                  previous_lngLatArray:[]
+                  previous_lngLatArray: []
                 }
               );
             }
@@ -95,11 +94,11 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
         self.update_activeFilteredRoutes();
         $scope.$apply();
-        $('#waitCard').hide(); 
-        $('#ui').show(); 
+        $('#waitCard').hide();
+        $('#ui').show();
       },
       (errorResponses) => {
-        self.errorReset(); 
+        self.errorReset();
       });
   };
 
@@ -112,8 +111,8 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
     for (i = 0; i < self.activeRoutes.length; i++) {
       if (regex.test(self.activeRoutes[i].attributes.long_name)) {
         let myRoute = self.activeRoutes[i];
-        myRoute['markerColor'] = 
-        self.activeFilteredRoutes.push(self.activeRoutes[i]);
+        myRoute['markerColor'] =
+          self.activeFilteredRoutes.push(self.activeRoutes[i]);
 
       }
     }
@@ -139,9 +138,9 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
             for (x = 0; x < self.selectedRoutes.length; x++) {
               for (y = 0; y < self.selectedRoutes[x].vehicles.length; y++) {
                 if (self.selectedRoutes[x].vehicles[y].vehicleId === vehicleId) {
-                  if(JSON.stringify(self.selectedRoutes[x].vehicles[y].lngLatArray)!=JSON.stringify(myLngLatArray)){
+                  if (JSON.stringify(self.selectedRoutes[x].vehicles[y].lngLatArray) != JSON.stringify(myLngLatArray)) {
                     // there is new data 
-                    self.selectedRoutes[x].vehicles[y].previous_lngLatArray = self.selectedRoutes[x].vehicles[y].lngLatArray; 
+                    self.selectedRoutes[x].vehicles[y].previous_lngLatArray = self.selectedRoutes[x].vehicles[y].lngLatArray;
                     self.selectedRoutes[x].vehicles[y].lngLatArray = myLngLatArray;
                   }
                 }
@@ -149,7 +148,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
             }
           },
           (errorResponse) => {
-            self.errorReset(); 
+            self.errorReset();
           });
 
         positionPromiseArray.push(positionPromise);
@@ -158,61 +157,66 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
     Promise.all(positionPromiseArray).then(
       (responses) => {
-        // update vehicle positions on map 
-        // first remove current markers 
-        // re-initialize marker array 
-        // add new markers 
-        let i,j = 0; 
-        for(i = 0; i<self.markerArray.length;i++){
-          self.markerArray[i].remove(); 
-        }
-        self.markerArray = [];
-        for(i=0; i<self.selectedRoutes.length;i++) {
-          for(j=0; j<self.selectedRoutes[i].vehicles.length;j++){
-            let myLngLatArray = self.selectedRoutes[i].vehicles[j].lngLatArray; 
-            let myPreviousLngLatArray = self.selectedRoutes[i].vehicles[j].previous_lngLatArray; 
-
-            let myMarkerColor = self.selectedRoutes[i].markerColor; 
-
-            let el = document.createElement('i');
-            el.className = 'fas fa-shuttle-van fa-2x';
-
-            el.style.color=myMarkerColor;
-
-
-
-            let rotationDegrees = self.get_iconRotation(myLngLatArray,myPreviousLngLatArray); 
-
-            let newMarker = new mapboxgl.Marker({element:el,rotation:rotationDegrees}).setLngLat(myLngLatArray).addTo(self.map); 
-            newMarker.addTo(self.map); 
-            self.markerArray.push(newMarker); 
-          }
-        }
+        self.updateVehiclePositions(); 
 
         $('#waitCard').hide();
-        $('#ui').show(); 
+        $('#ui').show();
 
       },
       (errorResponses) => {
-        self.errorReset();
+        self.updateVehiclePositions();
+        
       });
+  }
+
+  self.updateVehiclePositions = function () {
+    // update vehicle positions on map 
+    // first remove current markers 
+    // re-initialize marker array 
+    // add new markers 
+    let i, j = 0;
+    for (i = 0; i < self.markerArray.length; i++) {
+      self.markerArray[i].remove();
+    }
+    self.markerArray = [];
+    for (i = 0; i < self.selectedRoutes.length; i++) {
+      for (j = 0; j < self.selectedRoutes[i].vehicles.length; j++) {
+        let myLngLatArray = self.selectedRoutes[i].vehicles[j].lngLatArray;
+        let myPreviousLngLatArray = self.selectedRoutes[i].vehicles[j].previous_lngLatArray;
+
+        let myMarkerColor = self.selectedRoutes[i].markerColor;
+
+        let el = document.createElement('i');
+        el.className = 'fas fa-shuttle-van fa-2x';
+
+        el.style.color = myMarkerColor;
+
+
+
+        let rotationDegrees = self.get_iconRotation(myLngLatArray, myPreviousLngLatArray);
+
+        let newMarker = new mapboxgl.Marker({ element: el, rotation: rotationDegrees }).setLngLat(myLngLatArray).addTo(self.map);
+        newMarker.addTo(self.map);
+        self.markerArray.push(newMarker);
+      }
+    }
   }
 
   setInterval(self.getSelectedVehiclesPosition, self.updateIntervalMs);
 
 
-  self.get_iconRotation = function(lngLatArray,previous_lngLatArray){
-    if(JSON.stringify(previous_lngLatArray) == '[]'){
-      return '0'; 
+  self.get_iconRotation = function (lngLatArray, previous_lngLatArray) {
+    if (JSON.stringify(previous_lngLatArray) == '[]') {
+      return '0';
     }
-    else{
-      let deltaLng = lngLatArray[0] - previous_lngLatArray[0]; 
+    else {
+      let deltaLng = lngLatArray[0] - previous_lngLatArray[0];
       let deltaLat = lngLatArray[1] - previous_lngLatArray[1];
-      let hypotenuse = Math.sqrt(Math.pow(deltaLng,2) + Math.pow(deltaLat,2)); 
-      let rotationAngle = Math.acos(deltaLng/hypotenuse);
+      let hypotenuse = Math.sqrt(Math.pow(deltaLng, 2) + Math.pow(deltaLat, 2));
+      let rotationAngle = Math.acos(deltaLng / hypotenuse);
       let pi = Math.PI;
-      let rotationDegrees = rotationAngle*360/(2*pi); 
-      return rotationDegrees; 
+      let rotationDegrees = rotationAngle * 360 / (2 * pi);
+      return rotationDegrees;
     }
   }
 
@@ -223,12 +227,12 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
     for (i = 0; i < self.activeFilteredRoutes.length; i++) {
       if (self.activeFilteredRoutes[i].selected == true) {
         selectedCounter++;
-        let my_route = self.activeFilteredRoutes[i]; 
-        my_route['markerColor'] = self.getMarkerColor(my_route.attributes.long_name); 
+        let my_route = self.activeFilteredRoutes[i];
+        my_route['markerColor'] = self.getMarkerColor(my_route.attributes.long_name);
         self.selectedRoutes.push(my_route);
       }
     }
-    $('#ui').hide(); 
+    $('#ui').hide();
     $('#waitCard').show();
   }
 
@@ -253,50 +257,43 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
 
   self.getMarkerColor = function (route_long_name) {
 
-    if(route_long_name.search(/red/gi)!=-1)
-    {
+    if (route_long_name.search(/red/gi) != -1) {
       return 'red';
     }
-    else if(route_long_name.search(/orange/gi)!=-1)
-    {
+    else if (route_long_name.search(/orange/gi) != -1) {
       return 'orange';
     }
-    else if(route_long_name.search(/green/gi)!=-1)
-    {
+    else if (route_long_name.search(/green/gi) != -1) {
       return 'green';
     }
-    else if(route_long_name.search(/blue/gi)!=-1)
-    {
+    else if (route_long_name.search(/blue/gi) != -1) {
       return 'blue';
     }
-    else{
+    else {
       return self.brightColorArray[Math.floor(Math.random() * self.brightColorArray.length)];
     }
 
   }
 
-  self.errorOk = function()
-  {
-    $('#errorCard').hide(); 
-    $('#ui').show(); 
-    
+  self.errorOk = function () {
+    $('#errorCard').hide();
+    $('#ui').show();
+
   }
 
-  self.errorReset = function()
-  {
+  self.errorReset = function () {
     self.selectedRoutes = [];
 
-    for(let i = 0; i < self.activeFilteredRoutes.length;i++)
-    {
-      self.activeFilteredRoutes[i].selected = false; 
+    for (let i = 0; i < self.activeFilteredRoutes.length; i++) {
+      self.activeFilteredRoutes[i].selected = false;
     }
 
-    $('#ui').hide(); 
-    $('#waitCard').hide(); 
+    $('#ui').hide();
+    $('#waitCard').hide();
     $('#errorCard').show();
   }
 
-  self.brightColorArray = ['#FF3855','#FFAA1D','#FFF700','#299617','#2243B6','#5946B2','#9C51B6','#A83731','#FF007C','#E936A7','#FDFF00','#AF6E4D'];
+  self.brightColorArray = ['#FF3855', '#FFAA1D', '#FFF700', '#299617', '#2243B6', '#5946B2', '#9C51B6', '#A83731', '#FF007C', '#E936A7', '#FDFF00', '#AF6E4D'];
 
 }]);
 
