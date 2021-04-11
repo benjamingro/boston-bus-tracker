@@ -11,7 +11,21 @@ This project has the following features.
 
 * Shows the orientation of the bus along the route.  
 
+#### Large Screen Size
+
 ![Large Screen Size](images/LapTopImage1.png?raw=true "Large Screen Size")
 
-[![Moving Ball Exercise](http://img.youtube.com/vi/UG3LNR4N-9o/0.jpg)](http://www.youtube.com/watch?v=UG3LNR4N-9o "Moving Ball Exercise")
+#### iPhone 6/7/8 Vertical
+
+![iPhone 6/7/8 Vertical](images/iPhoneVertical1.png?raw=true "iPhone 6/7/8 Vertical")
+
+![iPhone 6/7/8 Vertical](images/iPhoneVertical2.png?raw=true "iPhone 6/7/8 Vertical")
+
+#### iPhone 6/7/8 Horizontal
+
+![iPhone 6/7/8 Horizontal](images/iPhoneHorizontal1.png?raw=true "iPhone 6/7/8 Vertical")
+
+![iPhone 6/7/8 Horizontal](images/iPhoneHorizontal2.png?raw=true "iPhone 6/7/8 Vertical")
+
+
 
