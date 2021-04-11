@@ -1,7 +1,7 @@
 ## Week 9 - Massachussetts Bay Transportation Authority (MBTA) Real Time Bus Tracker
 #### MIT xPRO Professional Certificate in Coding: Full Stack Development with MERN - January 2021
 
-This repository was created to show my work for the coding assignment in week 9. This is a web app that tracks MBTA buses on a map. View this project on GitHub Pages [here](https://benjamingro.github.io/boston-bus-tracker/).
+This repository was created to show my work for the coding assignment in week 9. This is a web app that tracks MBTA buses on a map. View this project at [https://benjamingro.github.io/boston-bus-tracker/](https://benjamingro.github.io/boston-bus-tracker/).
 
 This project has the following features. 
 
