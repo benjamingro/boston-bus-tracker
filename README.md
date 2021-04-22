@@ -39,6 +39,8 @@ This project has the following features.
 
 ![iPhone 6/7/8 Horizontal](images/iPhoneHorizontal2.png?raw=true "iPhone 6/7/8 Vertical")
 
+## License
+![MIT License](./LICENSE "MIT License")
 
 
 
