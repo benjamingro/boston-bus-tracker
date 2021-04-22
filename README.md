@@ -39,7 +39,10 @@ This project has the following features.
 
 ![iPhone 6/7/8 Horizontal](images/iPhoneHorizontal2.png?raw=true "iPhone 6/7/8 Vertical")
 
-## License
+### Future Work 
+Currently this project issues one API location request per bus to track the location for each bus that has been selected. For a large number of buses, this can lead to a lot of API requests. To minimize the number of API requests, it may be better to issue a single API request for all the bus locations at once and parse this location data to update the location of each bus that has been selected. 
+
+### License
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 
