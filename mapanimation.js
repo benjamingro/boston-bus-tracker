@@ -19,7 +19,7 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
   self.sizeMap = function () {
     let mapMaxHeight = $(window).height() - $('#navbarTop').height() - $('#navbarBottom').height() - 100;
     if (mapMaxHeight < 600) mapMaxHeight = 600;
-    $('#map').width($('#mapCol').width());
+    $('#map').width($('#mapLegend').width());
     $('#map').height(mapMaxHeight);
     self.map.resize();
   }
@@ -27,6 +27,8 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
   self.markerArray = [];
 
   self.marker = {};
+
+  self.updateSelectedRoutes_scrollToMap = false; 
 
   // #endregion
 
@@ -162,6 +164,17 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         $('#waitCard').hide();
         $('#ui').show();
 
+        if(self.updateSelectedRoutes_scrollToMap == true)
+        {
+          self.updateSelectedRoutes_scrollToMap = false; 
+          if($(window).height()<800 && $(window).width()<800)
+          {
+            const mapPosition = $('#mapLegend').position().top + 60; 
+            $('html,body').animate({ scrollTop: mapPosition }, 'slow');
+          }
+          
+
+        }
       },
       (errorResponses) => {
         self.updateVehiclePositions();
@@ -231,6 +244,10 @@ angular.module('busTrackerApp', []).controller('BusTrackerCtrl', ['$scope', '$ht
         my_route['markerColor'] = self.getMarkerColor(my_route.attributes.long_name);
         self.selectedRoutes.push(my_route);
       }
+    }
+    if(selectedCounter>=1)
+    {
+      self.updateSelectedRoutes_scrollToMap = true; 
     }
     $('#ui').hide();
     $('#waitCard').show();
